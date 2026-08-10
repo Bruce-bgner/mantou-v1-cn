@@ -546,8 +546,12 @@ prog: all
 
 # Clean build artifacts
 clean:
+ifeq ($(OS), Windows_NT)
 	@if exist $(BUILD) $(RM) $(BUILD)
 	@if exist $(BIN) $(RM) $(BIN)
+else
+	@$(RM) $(BUILD) $(BIN)
+endif
 
 # Print help information
 help:

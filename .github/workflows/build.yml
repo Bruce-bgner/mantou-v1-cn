@@ -26,11 +26,17 @@ jobs:
         pip3 install crcmod
 
     - name: Build firmware
-      run: make clean && make
+      run: make clean && make all
 
-    - name: Build packed firmware
-      run: make prog || true
-      continue-on-error: true
+    - name: Pack firmware (add metadata)
+      run: |
+        python3 utils/fw-pack.py bin/*.bin \
+          "$(grep -oP '(?<=AUTHOR_STRING\s*=\s*")[^"]*' Makefile)" \
+          "$(grep -oP '(?<=VERSION_STRING\s*=\s*")[^"]*' Makefile)" \
+          bin/Mantou.packed.bin || true
+
+    - name: Show build artifacts
+      run: ls -la bin/
 
     - name: Upload firmware artifacts
       uses: actions/upload-artifact@v4
@@ -38,4 +44,3 @@ jobs:
         name: Mantou-V1.0-firmware
         path: |
           bin/*.bin
-          bin/*.packed.bin
