@@ -28,19 +28,25 @@ jobs:
     - name: Build firmware
       run: make clean && make all
 
-    - name: Pack firmware (add metadata)
+    - name: Pack firmware (add metadata for flasher)
       run: |
-        python3 utils/fw-pack.py bin/*.bin \
-          "$(grep -oP '(?<=AUTHOR_STRING\s*=\s*")[^"]*' Makefile)" \
-          "$(grep -oP '(?<=VERSION_STRING\s*=\s*")[^"]*' Makefile)" \
-          bin/Mantou.packed.bin || true
-
-    - name: Show build artifacts
-      run: ls -la bin/
+        BIN_DIR=firmware
+        BIN_FILE=$(ls $BIN_DIR/*.bin 2>/dev/null | head -1)
+        if [ -n "$BIN_FILE" ]; then
+          echo "Found bin: $BIN_FILE"
+          PACKED_OUT="${BIN_FILE%.bin}.packed.bin"
+          python3 utils/fw-pack.py "$BIN_FILE" "Mantou-CN" "V1.0-CN" "$PACKED_OUT" || true
+          ls -la $BIN_DIR/
+        else
+          echo "WARNING: no .bin file found in firmware/ or _build/"
+          find . -maxdepth 3 -name "*.bin" -o -name "*.out" || true
+        fi
 
     - name: Upload firmware artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Mantou-V1.0-firmware
         path: |
-          bin/*.bin
+          firmware/*.bin
+          firmware/*.packed.bin
+          _build/*.out

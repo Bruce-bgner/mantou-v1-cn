@@ -523,16 +523,19 @@ $(BUILD)/%.o: %.S
 #------------------------------------------------------------------------------
 
 # Main firmware
-app: $(BUILD)/$(PROJECT_NAME).out
+app: $(BIN)/$(PROJECT_NAME).bin
 
 $(BUILD)/$(PROJECT_NAME).out: $(OBJECTS)
 	@echo LD $@
 	@$(CC) $(CCFLAGS) $(LDFLAGS) $^ -o $@
+	@echo Create $(notdir $@)
+	@-$(SIZE) $@
 
 #------------------------------------------------------------------------------
 #------------------- Binary generator -----------------------------------------
+$(BIN)/$(PROJECT_NAME).bin: $(BUILD)/$(PROJECT_NAME).out | directories
 	@echo Create $(notdir $@)
-	@$(OBJCOPY) -O binary $(BUILD)/$(PROJECT_NAME).out $(BIN)/$(PROJECT_NAME).bin
+	@$(OBJCOPY) -O binary $< $@
 
 prog: all
 	@echo Create $(PROJECT_NAME).packed.bin
