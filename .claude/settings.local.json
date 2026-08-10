@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd.exe /c \"make clean\")",
+      "Bash(cmd.exe /c \"make 2>&1\")",
+      "Bash(powershell.exe -Command \"cd ''D:\\\\Work\\\\UV-K5\\\\Firmware_DEV\\\\UV-KX-firmware''; make 2>&1 | Select-Object -Last 30\")",
+      "Bash(make:*)"
+    ]
+  }
+}
